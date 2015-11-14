@@ -1,0 +1,84 @@
+* {
+    padding:0;
+    margin:0;
+    box-sizing: border-box;
+}
+body {
+    background-color: aliceblue;
+}
+#video-player {
+    width: 640px;
+    position: absolute;
+}
+#video-player video {
+    width: 640px;
+}
+.control-bar {
+    background-color: hsl(0, 0%, 7%);
+    height: 2.5rem;
+    position: absolute;
+    bottom: 0;
+    z-index: 100;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+}
+.control-bar .left-part {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.control-bar .right-part {
+    display: flex;
+}
+.control-bar .play-btn {
+    height: 100%;
+    width: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.control-bar .timer, .control-bar .full-screen {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: .8125rem;
+}
+.control-bar .full-screen {
+    width: 3rem;
+    font-size: 1.2rem;
+}
+.control-bar .volume {
+    width: 4rem;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.control-bar .settings {
+    width: 4rem;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.control-bar .volume .outer {
+    height: 0.5rem;
+    width: 4rem;
+    border-radius: .8rem;
+    position: relative;
+
+}
+.control-bar .volume .inner {
+    background-color: rgb(245, 83, 66);
+}
+.control-bar .volume .slider {
+    width: 0.5rem;
+    height: 1rem;
+    background: white none repeat scroll 0% 0%;
+    top: -0.25rem;
+    position: absolute;
+    border-radius: 0.5rem;
+}
