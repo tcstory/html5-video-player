@@ -5,8 +5,6 @@
 
 var gulp = require('gulp');
 var del = require('del');
-var webpack = require('webpack');
-var gulpWebpack = require('gulp-webpack');
 
 
 
@@ -15,20 +13,10 @@ gulp.task('clear', function () {
 });
 
 gulp.task('step1', function () {
-   return gulp.src('')
-       .pipe(gulpWebpack(require('./webpack.config.js'),webpack))
-       .pipe(gulp.dest('build/'));
+   return gulp.src('src/**/*')
+       .pipe(gulp.dest('build/'))
 });
 
-gulp.task('step2', ['step1'], function () {
-   return gulp.src('build/fonts/*')
-       .pipe(gulp.dest('build/css/fonts/'))
-});
-
-gulp.task('step3', ['step2'], function () {
-   return del('build/fonts/')
-});
-
-gulp.task('build',['step1', 'step2', 'step3'], function () {
+gulp.task('build',['step1'], function () {
 
 });
