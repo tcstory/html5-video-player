@@ -17,19 +17,34 @@
                 <i class="fa fa-play" v-show="!isPlaying"></i>
                 <i class="fa fa-pause" v-show="isPlaying"></i>
             </div>
-            <div class="timer"><span class="cur-time">00.54.21</span>/<span class="total-time" v-text="duration"></span></div>
+            <div class="timer">
+                <span class="cur-time" v-text="initTime"></span>
+                <span>/</span>
+                <span class="total-time" v-text="duration"></span>
+            </div>
         </div>
         <div class="progress-bar">
-            <div class="outer">
-                <div class="inner"></div>
-                <div class="slider"></div>
+            <div class="cache-bar"></div>
+            <div class="outer"
+                 v-on:click.stop="handleProgressbarClick"
+                 v-on:mouseup.stop="handleProgressbarMouseup"
+                 v-on:mouseleave.stop="handleProgressbarMouseleave"
+                 v-on:mousemove.stop="handleProgressbarMousemove">
+                <div class="inner" v-bind:style="{width: curProgress * 100 + '%'}">
+                    <div class="slider" v-on:mousedown.stop="handleProgressbarMousedown"></div>
+                </div>
             </div>
         </div>
         <div class="right-part">
             <div class="volume">
-                <div class="outer">
-                    <div class="inner"></div>
-                    <div class="slider"></div>
+                <div class="outer"
+                     v-on:mousemove.stop="handleVolumeMousemove"
+                     v-on:mouseleave.stop="handleVolumeMouseleave"
+                     v-on:click.stop="handleVolumeClick"
+                     v-on:mouseup.stop="handleVolumeMouseup">
+                    <div class="inner" v-bind:style="{width: curVolume * 100 + '%'}">
+                        <div class="slider" v-on:mousedown.stop="handleVolumeMousedown"></div>
+                    </div>
                 </div>
             </div>
             <div class="settings"><i class="fa fa-cogs"></i></div>

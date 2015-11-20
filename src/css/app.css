@@ -15,7 +15,7 @@ body {
 }
 #video-player video::-webkit-media-controls { display:none !important; }
 .control-bar {
-    background-color: hsl(0, 0%, 7%);
+    background-color: hsla(0, 0%, 7%, 0.7);
     height: 2.5rem;
     position: absolute;
     bottom: 0;
@@ -47,16 +47,25 @@ body {
     left:0;
     right:0;
     height: 0.5rem;
-    background-color: rgb(147, 147, 147);
+    background-color: black;
+    border-radius: 1rem;
+}
+.control-bar .progress-bar .cache-bar {
+    height:100%;
+    background-color: darkgray;
+    border-radius: 1rem;
 }
 .control-bar .progress-bar .outer {
     height: 100%;
-    background-color: darkgray;
+    background-color: transparent;
     width: 100%;
-    position: relative;
     cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 .control-bar .progress-bar .inner {
+    position: relative;
     height: 100%;
     background-color: rgb(245, 83, 66);
 }
@@ -67,6 +76,15 @@ body {
     background-color: white;
     position: absolute;
     top: -50%;
+    right: -.5rem;
+    -webkit-transition: box-shadow 300ms;
+    -moz-transition: box-shadow 300ms;
+    -ms-transition: box-shadow 300ms;
+    -o-transition: box-shadow 300ms;
+    transition: box-shadow 300ms;
+}
+.control-bar .progress-bar .slider:hover {
+    box-shadow: 0 0 1px 1px #7A7A7A;
 }
 .control-bar .left-part {
     display: -webkit-flex;
@@ -133,13 +151,13 @@ body {
     align-items: center;
 }
 .control-bar .volume .outer {
-    height: 0.5rem;
+    height: 0.25rem;
     width: 4rem;
     border-radius: .8rem;
-    position: relative;
     background-color: darkgray;
 }
 .control-bar .volume .inner {
+    position: relative;
     background-color: rgb(245, 83, 66);
 	height: 100%;
 }
@@ -147,7 +165,8 @@ body {
     width: 0.5rem;
     height: 1rem;
     background: white none repeat scroll 0 0;
-    top: -0.25rem;
+    right: -0.25rem;
+    top: -0.375rem;
     position: absolute;
     border-radius: 0.5rem;
 }
