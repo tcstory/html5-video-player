@@ -4,7 +4,8 @@
 
 var stateMap = {
     defaultVolume: 0.7,
-    hideTime: 2000
+    hideTime: 2000,
+    delayId: null
 };
 var videoObj = (function () {
     var _video_obj = {};
@@ -73,10 +74,11 @@ function isFullScreen() {
 document.addEventListener('fullscreenchange', function (e) {
     if (isFullScreen()) {
         vm.isFullscreen = true;
-        setTimeout(function () {
+        stateMap.delayId = setTimeout(function () {
             vm.isInvisible = true;
         }, stateMap.hideTime)
     } else {
+        clearTimeout(stateMap.delayId);
         vm.isFullscreen = false;
         vm.isInvisible = false;
 
@@ -85,11 +87,12 @@ document.addEventListener('fullscreenchange', function (e) {
 document.addEventListener('webkitfullscreenchange', function () {
     if (isFullScreen()) {
         vm.isFullscreen = true;
-        setTimeout(function () {
+        stateMap.delayId = setTimeout(function () {
             vm.isInvisible = true;
 
         }, stateMap.hideTime)
     } else {
+        clearTimeout(stateMap.delayId);
         vm.isFullscreen = false;
         vm.isInvisible = false;
 
@@ -98,11 +101,12 @@ document.addEventListener('webkitfullscreenchange', function () {
 document.addEventListener('mozfullscreenchange', function () {
     if (isFullScreen()) {
         vm.isFullscreen = true;
-        setTimeout(function () {
+        stateMap.delayId = setTimeout(function () {
             vm.isInvisible = true;
 
         }, stateMap.hideTime)
     } else {
+        clearTimeout(stateMap.delayId);
         vm.isFullscreen = false;
         vm.isInvisible = false;
     }
@@ -110,11 +114,12 @@ document.addEventListener('mozfullscreenchange', function () {
 document.addEventListener('msfullscreenchange', function () {
     if (isFullScreen()) {
         vm.isFullscreen = true;
-        setTimeout(function () {
+        stateMap.delayId = setTimeout(function () {
             vm.isInvisible = true;
 
         }, stateMap.hideTime)
     } else {
+        clearTimeout(stateMap.delayId);
         vm.isFullscreen = false;
         vm.isInvisible = false;
     }
