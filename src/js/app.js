@@ -85,7 +85,7 @@ var videoObj = (function (vm) {
     _video_obj.duration = _video.duration;
     _video_obj.controlBar = document.querySelector(configMap.videoPlayer + ' .control-bar');
     _video.addEventListener('loadedmetadata', function (ev) {
-        vm.duration =  convertTime(_video.duration);
+        vm.duration = convertTime(_video.duration);
     });
     return _video_obj;
 })(vm);
@@ -93,21 +93,10 @@ var videoObj = (function (vm) {
 var volumer = (function (vm) {
     var _volumer = {};
     _volumer._isGrag = false;
-    _volumer._pos1 =
-        document.querySelector(configMap.videoPlayer + ' .volume .outer')
-            .getBoundingClientRect().left;
-    _volumer._pos2 =
-        document.querySelector(configMap.videoPlayer + ' .volume .outer')
-            .getBoundingClientRect().right;
-    _volumer._width =
-        parseFloat(getComputedStyle(
-            document.querySelector(configMap.videoPlayer + ' .volume .outer')).width
-        );
+    _volumer._outer = document.querySelector(configMap.videoPlayer + ' .volume .outer');
     _volumer.handleVolumeClick = function (ev) {
-        if (_volumer._pos1 <= ev.clientX && ev.clientX <= _volumer._pos2) {
-            var _diff = ev.clientX - _volumer._pos1;
-            vm.curVolume = _diff / _volumer._width
-        }
+        var _diff = ev.clientX - _volumer._outer.getBoundingClientRect().left;
+        vm.curVolume = _diff / parseFloat(getComputedStyle(_volumer._outer, null).width)
     };
     _volumer.handleVolumeMousedown = function (ev) {
         _volumer._isGrag = true;
@@ -117,9 +106,10 @@ var volumer = (function (vm) {
     };
     _volumer.handleVolumeMousemove = function (ev) {
         if (_volumer._isGrag) {
-            if (_volumer._pos1 <= ev.clientX && ev.clientX <= _volumer._pos2) {
-                var _diff = ev.clientX - _volumer._pos1;
-                vm.curVolume = _diff / _volumer._width
+            var _diff = ev.clientX - _volumer._outer.getBoundingClientRect().left;
+            var _max_width = parseFloat(getComputedStyle(_volumer._outer, null).width);
+            if (_diff <= _max_width && _diff > 0) {
+                vm.curVolume = _diff / _max_width;
             }
         }
     };
@@ -133,21 +123,10 @@ var volumer = (function (vm) {
 var progressbarer = (function (vm) {
     var _progressbarer = {};
     _progressbarer._isGrag = false;
-    _progressbarer._pos1 =
-        document.querySelector(configMap.videoPlayer + ' .progress-bar .outer')
-            .getBoundingClientRect().left;
-    _progressbarer._pos2 =
-        document.querySelector(configMap.videoPlayer + ' .progress-bar .outer')
-            .getBoundingClientRect().right;
-    _progressbarer._width =
-        parseFloat(getComputedStyle(
-            document.querySelector(configMap.videoPlayer + ' .progress-bar .outer')).width
-        );
+    _progressbarer._outer = document.querySelector(configMap.videoPlayer + ' .progress-bar .outer');
     _progressbarer.handleProgressbarClick = function (ev) {
-        if (_progressbarer._pos1 <= ev.clientX && ev.clientX <= _progressbarer._pos2) {
-            var _diff = ev.clientX - _progressbarer._pos1;
-            vm.curProgress = _diff / _progressbarer._width
-        }
+        var _diff = ev.clientX - _progressbarer._outer.getBoundingClientRect().left;
+        vm.curProgress = _diff / parseFloat(getComputedStyle(_progressbarer._outer, null).width)
     };
     _progressbarer.handleProgressbarMousedown = function (ev) {
         _progressbarer._isGrag = true;
@@ -157,9 +136,10 @@ var progressbarer = (function (vm) {
     };
     _progressbarer.handleProgressbarMousemove = function (ev) {
         if (_progressbarer._isGrag) {
-            if (_progressbarer._pos1 <= ev.clientX && ev.clientX <= _progressbarer._pos2) {
-                var _diff = ev.clientX - _progressbarer._pos1;
-                vm.curProgress = _diff / _progressbarer._width
+            var _diff = ev.clientX - _progressbarer._outer.getBoundingClientRect().left;
+            var _max_width = parseFloat(getComputedStyle(_progressbarer._outer, null).width);
+            if (_diff <= _max_width && _diff > 0) {
+                vm.curProgress = _diff / _max_width;
             }
         }
     };
@@ -182,7 +162,7 @@ function convertTime(seconds) {
     if (_minute < 10) {
         _time = _time + ':0' + _minute;
     } else {
-        _time = _time + ':' +_minute;
+        _time = _time + ':' + _minute;
     }
     var _second = seconds % 60;
     if (_second < 10) {
