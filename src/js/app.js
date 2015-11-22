@@ -31,6 +31,9 @@ var vm = new Vue({
                 videoObj.video.pause();
             } else {
                 videoObj.video.play();
+                configMap.delayId = setTimeout(function () {
+                    vm.isInvisible = true;
+                }, configMap.hideTime)
             }
         },
         handleVolumeMousedown: function (ev) {
@@ -95,9 +98,13 @@ var videoObj = (function (vm) {
         }
     });
     _video.addEventListener('playing', function () {
+        configMap.delayId = setTimeout(function () {
+            vm.isInvisible = true;
+        });
         vm.isPlaying = true;
     });
     _video.addEventListener('pause', function () {
+        vm.isInvisible = false;
         vm.isPlaying = false;
     });
     _video.addEventListener('progress', function () {
@@ -225,53 +232,28 @@ function isFullScreen() {
 document.addEventListener('fullscreenchange', function (e) {
     if (isFullScreen()) {
         vm.isFullscreen = true;
-        configMap.delayId = setTimeout(function () {
-            vm.isInvisible = true;
-        }, configMap.hideTime)
     } else {
-        clearTimeout(configMap.delayId);
         vm.isFullscreen = false;
-        vm.isInvisible = false;
-
     }
 });
 document.addEventListener('webkitfullscreenchange', function () {
     if (isFullScreen()) {
         vm.isFullscreen = true;
-        configMap.delayId = setTimeout(function () {
-            vm.isInvisible = true;
-
-        }, configMap.hideTime)
     } else {
-        clearTimeout(configMap.delayId);
         vm.isFullscreen = false;
-        vm.isInvisible = false;
-
     }
 });
 document.addEventListener('mozfullscreenchange', function () {
     if (isFullScreen()) {
         vm.isFullscreen = true;
-        configMap.delayId = setTimeout(function () {
-            vm.isInvisible = true;
-
-        }, configMap.hideTime)
     } else {
-        clearTimeout(configMap.delayId);
         vm.isFullscreen = false;
-        vm.isInvisible = false;
     }
 });
 document.addEventListener('msfullscreenchange', function () {
     if (isFullScreen()) {
         vm.isFullscreen = true;
-        configMap.delayId = setTimeout(function () {
-            vm.isInvisible = true;
-
-        }, configMap.hideTime)
     } else {
-        clearTimeout(configMap.delayId);
         vm.isFullscreen = false;
-        vm.isInvisible = false;
     }
 });
