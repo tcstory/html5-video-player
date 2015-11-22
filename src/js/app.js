@@ -22,6 +22,7 @@ var vm = new Vue({
         isFullscreen: false,
         isInvisible: false,
         duration: '',
+        buffered: 0,
         timeStr: configMap.initTime
     },
     methods: {
@@ -98,6 +99,12 @@ var videoObj = (function (vm) {
     });
     _video.addEventListener('pause', function () {
         vm.isPlaying = false;
+    });
+    _video.addEventListener('progress', function () {
+        var _len = _video.buffered.length;
+        if (_len != 0) {
+            vm.buffered = _video.buffered.end(_len - 1) / _video.duration;
+        }
     });
     return _video_obj;
 })(vm);

@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="progress-bar">
-            <div class="cache-bar"></div>
+            <div class="cache-bar" v-bind:style="{width: buffered * 100 + '%'}"></div>
             <div class="outer"
                  v-on:click.stop="handleProgressbarClick"
                  v-on:mouseup.stop="handleProgressbarMouseup"
