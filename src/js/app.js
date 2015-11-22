@@ -8,7 +8,7 @@ var configMap = {
     defaultVolume: 0.7,
     hideTime: 2000,
     delayId: null,
-    initTime: '0:00',
+    initTime: '0:00:00',
     videoPlayer: '#video-player'
 };
 
@@ -22,24 +22,14 @@ var vm = new Vue({
         isFullscreen: false,
         isInvisible: false,
         duration: '',
-        initTime: configMap.initTime
-    },
-    computed: {
-        volumeLength: function () {
-            return this.curVolume * 100 + '%';
-        },
-        progressLength: function () {
-            return this.curProgress * 100 + '%';
-        }
+        timeStr: configMap.initTime
     },
     methods: {
         playVideo: function () {
             if (this.isPlaying) {
                 videoObj.video.pause();
-                this.isPlaying = false;
             } else {
                 videoObj.video.play();
-                this.isPlaying = true;
             }
         },
         handleVolumeMousedown: function (ev) {
@@ -75,6 +65,11 @@ var vm = new Vue({
         handleFullscreen: function () {
             handleFullscreen(this);
         }
+    },
+    watch: {
+        curVolume: function (newVal) {
+            videoObj.video.volume = newVal;
+        }
     }
 });
 
@@ -83,9 +78,26 @@ var videoObj = (function (vm) {
     var _video = document.querySelector(configMap.videoPlayer + ' video');
     _video_obj.video = _video;
     _video_obj.duration = _video.duration;
+    _video.volume = configMap.defaultVolume;
     _video_obj.controlBar = document.querySelector(configMap.videoPlayer + ' .control-bar');
     _video.addEventListener('loadedmetadata', function (ev) {
         vm.duration = convertTime(_video.duration);
+    });
+    _video.addEventListener('timeupdate', function () {
+        var timeId = null;
+        if (!timeId) {
+            timeId = setTimeout(function () {
+                vm.curProgress = _video.currentTime / _video.duration;
+                vm.timeStr = convertTime(_video.currentTime);
+                clearTimeout(timeId);
+            }, 800);
+        }
+    });
+    _video.addEventListener('playing', function () {
+        vm.isPlaying = true;
+    });
+    _video.addEventListener('pause', function () {
+        vm.isPlaying = false;
     });
     return _video_obj;
 })(vm);
@@ -127,6 +139,11 @@ var progressbarer = (function (vm) {
     _progressbarer.handleProgressbarClick = function (ev) {
         var _diff = ev.clientX - _progressbarer._outer.getBoundingClientRect().left;
         vm.curProgress = _diff / parseFloat(getComputedStyle(_progressbarer._outer, null).width)
+        videoObj.video.currentTime = videoObj.video.duration * vm.curProgress;
+        vm.timeStr = convertTime(videoObj.video.currentTime);
+        if (videoObj.video.paused) {
+            videoObj.video.play()
+        }
     };
     _progressbarer.handleProgressbarMousedown = function (ev) {
         _progressbarer._isGrag = true;
@@ -140,6 +157,11 @@ var progressbarer = (function (vm) {
             var _max_width = parseFloat(getComputedStyle(_progressbarer._outer, null).width);
             if (_diff <= _max_width && _diff > 0) {
                 vm.curProgress = _diff / _max_width;
+                videoObj.video.currentTime = videoObj.video.duration * vm.curProgress;
+                vm.timeStr = convertTime(videoObj.video.currentTime);
+                if (videoObj.video.paused) {
+                    videoObj.video.play()
+                }
             }
         }
     };
