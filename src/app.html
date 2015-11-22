@@ -10,7 +10,9 @@
 </head>
 <body>
 <div id="video-player">
-    <video src="http://mpv.videocc.net/7f059eafbb/4/7f059eafbb7d8f7ca80d0842cf9fa844_3.mp4"></video>
+    <video
+            v-on:click.stop="playVideo"
+            src="http://mpv.videocc.net/7f059eafbb/4/7f059eafbb7d8f7ca80d0842cf9fa844_3.mp4"></video>
     <div class="control-bar" v-bind:class="{fullscreen: isFullscreen,invisible: isInvisible}">
         <div class="left-part">
             <div class="play-btn" v-on:click.stop="playVideo">
