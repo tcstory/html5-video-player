@@ -9,10 +9,10 @@
     <script src="bower_components/vue/dist/vue.min.js"></script>
 </head>
 <body>
-<div id="video-player">
+<div id="video-player" v-cloak>
     <video
             v-on:click.stop="playVideo"
-            src="http://mpv.videocc.net/7f059eafbb/4/7f059eafbb7d8f7ca80d0842cf9fa844_3.mp4"></video>
+            src="http://7qn8rp.com1.z0.glb.clouddn.com/十二课过场动画.mp4"></video>
     <div class="control-bar" v-bind:class="{fullscreen: isFullscreen,invisible: isInvisible}">
         <div class="left-part">
             <div class="play-btn" v-on:click.stop="playVideo">
@@ -49,7 +49,26 @@
                     </div>
                 </div>
             </div>
-            <div class="settings"><i class="fa fa-cogs"></i></div>
+            <div class="settings">
+                <i class="fa fa-cogs"  v-on:click.stop="handleSettingClick"></i>
+                <div class="setting-window" v-show="isSetting">
+                    <div class="menu">
+                        <div class="item">
+                            <span>画质</span>
+                            <span class="video-quality" v-on:click.stop="openQualityWindow" v-text="whichQuality"></span>
+                        </div>
+                        <div class="item">
+                            <span>弹幕</span>
+                            <div class="toggle-danmu-btn" v-on:click.stop="toggleDanmuClick"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="change-quality-window" v-show="isSettingQuality">
+                    <div>超清<div class="toggle-btn"  data-quality="high" v-on:click.stop="changeQualityClick('high')"></div></div>
+                    <div>高清<div class="toggle-btn" data-quality="medium" v-on:click.stop="changeQualityClick('medium')"></div></div>
+                    <div>标清<div class="toggle-btn"  data-quality="low" v-on:click.stop="changeQualityClick('low')"></div></div>
+                </div>
+            </div>
             <div class="full-screen" v-on:click.stop="handleFullscreen">
                 <i class="fa fa-arrows-alt"></i>
             </div>

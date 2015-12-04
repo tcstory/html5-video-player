@@ -6,6 +6,7 @@
 
 var configMap = {
     defaultVolume: 0.7,
+    defaultVideoQuality: 'medium',
     hideTime: 2000,
     delayId: null,
     initTime: '0:00:00',
@@ -13,17 +14,25 @@ var configMap = {
 };
 
 
-var vm = new Vue({
+var videoVM = new Vue({
     el: '#video-player',
     data: {
         isPlaying: false,
+        isSetting: false,
+        isSettingQuality: false,
         curVolume: configMap.defaultVolume,
         curProgress: 0,
         isFullscreen: false,
         isInvisible: false,
         duration: '',
         buffered: 0,
-        timeStr: configMap.initTime
+        timeStr: configMap.initTime,
+        whichQuality: ''
+    },
+    watch: {
+        curVolume: function (newVal) {
+            videoObj.video.volume = newVal;
+        }
     },
     methods: {
         playVideo: function () {
@@ -32,7 +41,7 @@ var vm = new Vue({
             } else {
                 videoObj.video.play();
                 configMap.delayId = setTimeout(function () {
-                    vm.isInvisible = true;
+                    videoVM.isInvisible = true;
                 }, configMap.hideTime)
             }
         },
@@ -68,16 +77,30 @@ var vm = new Vue({
         },
         handleFullscreen: function () {
             handleFullscreen(this);
-        }
-    },
-    watch: {
-        curVolume: function (newVal) {
-            videoObj.video.volume = newVal;
+        },
+        handleSettingClick: function (ev) {
+            if (this.isSettingQuality) {
+                this.isSetting = false;
+                this.isSettingQuality = false;
+            } else {
+                this.isSetting = !this.isSetting;
+                this.isSettingQuality = false;
+            }
+        },
+        toggleDanmuClick: function (ev) {
+            danmu.toggle();
+        },
+        openQualityWindow: function (ev) {
+            this.isSettingQuality = true;
+            this.isSetting = false;
+        },
+        changeQualityClick: function (which) {
+            videoQuality.changeVideoQuality(which);
         }
     }
 });
 
-var videoObj = (function (vm) {
+var videoObj = (function (videoVM) {
     var _video_obj = {};
     var _video = document.querySelector(configMap.videoPlayer + ' video');
     _video_obj.video = _video;
@@ -85,44 +108,47 @@ var videoObj = (function (vm) {
     _video.volume = configMap.defaultVolume;
     _video_obj.controlBar = document.querySelector(configMap.videoPlayer + ' .control-bar');
     _video.addEventListener('loadedmetadata', function (ev) {
-        vm.duration = convertTime(_video.duration);
+        videoVM.duration = convertTime(_video.duration);
     });
     _video.addEventListener('timeupdate', function () {
         var timeId = null;
         if (!timeId) {
             timeId = setTimeout(function () {
-                vm.curProgress = _video.currentTime / _video.duration;
-                vm.timeStr = convertTime(_video.currentTime);
+                videoVM.curProgress = _video.currentTime / _video.duration;
+                videoVM.timeStr = convertTime(_video.currentTime);
                 clearTimeout(timeId);
             }, 800);
         }
     });
     _video.addEventListener('playing', function () {
         configMap.delayId = setTimeout(function () {
-            vm.isInvisible = true;
+            videoVM.isInvisible = true;
         });
-        vm.isPlaying = true;
+        videoVM.isPlaying = true;
     });
     _video.addEventListener('pause', function () {
-        vm.isInvisible = false;
-        vm.isPlaying = false;
+        videoVM.isInvisible = false;
+        videoVM.isPlaying = false;
     });
     _video.addEventListener('progress', function () {
         var _len = _video.buffered.length;
         if (_len != 0) {
-            vm.buffered = _video.buffered.end(_len - 1) / _video.duration;
+            videoVM.buffered = _video.buffered.end(_len - 1) / _video.duration;
         }
     });
+    _video_obj.changeVideoQuality = function (src) {
+        _video.src = src;
+    };
     return _video_obj;
-})(vm);
+})(videoVM);
 
-var volumer = (function (vm) {
+var volumer = (function (videoVM) {
     var _volumer = {};
     _volumer._isGrag = false;
     _volumer._outer = document.querySelector(configMap.videoPlayer + ' .volume .outer');
     _volumer.handleVolumeClick = function (ev) {
         var _diff = ev.clientX - _volumer._outer.getBoundingClientRect().left;
-        vm.curVolume = _diff / parseFloat(getComputedStyle(_volumer._outer, null).width)
+        videoVM.curVolume = _diff / parseFloat(getComputedStyle(_volumer._outer, null).width)
     };
     _volumer.handleVolumeMousedown = function (ev) {
         _volumer._isGrag = true;
@@ -135,7 +161,7 @@ var volumer = (function (vm) {
             var _diff = ev.clientX - _volumer._outer.getBoundingClientRect().left;
             var _max_width = parseFloat(getComputedStyle(_volumer._outer, null).width);
             if (_diff <= _max_width && _diff > 0) {
-                vm.curVolume = _diff / _max_width;
+                videoVM.curVolume = _diff / _max_width;
             }
         }
     };
@@ -143,18 +169,17 @@ var volumer = (function (vm) {
         _volumer._isGrag = false;
     };
     return _volumer;
-})(vm);
+})(videoVM);
 
-
-var progressbarer = (function (vm) {
+var progressbarer = (function (videoVM) {
     var _progressbarer = {};
     _progressbarer._isGrag = false;
     _progressbarer._outer = document.querySelector(configMap.videoPlayer + ' .progress-bar .outer');
     _progressbarer.handleProgressbarClick = function (ev) {
         var _diff = ev.clientX - _progressbarer._outer.getBoundingClientRect().left;
-        vm.curProgress = _diff / parseFloat(getComputedStyle(_progressbarer._outer, null).width)
-        videoObj.video.currentTime = videoObj.video.duration * vm.curProgress;
-        vm.timeStr = convertTime(videoObj.video.currentTime);
+        videoVM.curProgress = _diff / parseFloat(getComputedStyle(_progressbarer._outer, null).width)
+        videoObj.video.currentTime = videoObj.video.duration * videoVM.curProgress;
+        videoVM.timeStr = convertTime(videoObj.video.currentTime);
         if (videoObj.video.paused) {
             videoObj.video.play()
         }
@@ -170,9 +195,9 @@ var progressbarer = (function (vm) {
             var _diff = ev.clientX - _progressbarer._outer.getBoundingClientRect().left;
             var _max_width = parseFloat(getComputedStyle(_progressbarer._outer, null).width);
             if (_diff <= _max_width && _diff > 0) {
-                vm.curProgress = _diff / _max_width;
-                videoObj.video.currentTime = videoObj.video.duration * vm.curProgress;
-                vm.timeStr = convertTime(videoObj.video.currentTime);
+                videoVM.curProgress = _diff / _max_width;
+                videoObj.video.currentTime = videoObj.video.duration * videoVM.curProgress;
+                videoVM.timeStr = convertTime(videoObj.video.currentTime);
                 if (videoObj.video.paused) {
                     videoObj.video.play()
                 }
@@ -183,7 +208,52 @@ var progressbarer = (function (vm) {
         _progressbarer._isGrag = false;
     };
     return _progressbarer;
-})(vm);
+})(videoVM);
+
+var settingMenu = (function () {
+    var _menu = document.querySelector('.control-bar .setting-window .menu');
+
+})(videoVM);
+var danmu = (function () {
+    var _danmu = {};
+    var toggle_danmu_btn = document.querySelector('#video-player .toggle-danmu-btn');
+    _danmu.toggle = function () {
+        toggle_danmu_btn.classList.toggle('clicked')
+    };
+    return _danmu;
+})();
+
+var videoQuality = (function () {
+    var btn_array = Array.prototype.slice.call(document.querySelectorAll('.change-quality-window  .toggle-btn'));
+    var quality_map = {
+        high: '超清',
+        medium: '高清',
+        low: '标清'
+    };
+    var _v = {};
+    _v.changeVideoQuality = function (which) {
+        btn_array.forEach(function (item) {
+            if (item.dataset['quality'] === which) {
+                item.classList.add('clicked');
+                videoVM.whichQuality = quality_map[which];
+            } else {
+                item.classList.remove('clicked');
+            }
+        })
+    };
+    _v.setDefaultQuality = function () {
+        if (!sessionStorage.getItem('video-quality')) {
+            sessionStorage.setItem('video-quality', configMap.defaultVideoQuality);
+            videoVM.whichQuality = configMap.defaultVideoQuality;
+            videoObj.changeVideoQuality('');
+        } else {
+            videoVM.whichQuality = quality_map[sessionStorage.getItem('video-quality')];
+            videoObj.changeVideoQuality('');
+        }
+    };
+    return _v;
+})();
+
 
 function convertTime(seconds) {
     seconds = parseInt(seconds);
@@ -209,16 +279,16 @@ function convertTime(seconds) {
     return _time;
 }
 
-function handleFullscreen(vm) {
+function handleFullscreen(videoVM) {
     if (isFullScreen()) {
-        vm.isFullscreen = false;
+        videoVM.isFullscreen = false;
         if (document.exitFullscreen) document.exitFullscreen();
         else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
         else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen();
         else if (document.msExitFullscreen) document.msExitFullscreen();
     }
     else {
-        vm.isFullscreen = true;
+        videoVM.isFullscreen = true;
         if (videoObj.video.requestFullscreen) videoObj.video.requestFullscreen();
         else if (videoObj.video.mozRequestFullScreen) videoObj.video.mozRequestFullScreen();
         else if (videoObj.video.webkitRequestFullScreen) videoObj.video.webkitRequestFullScreen();
@@ -231,29 +301,29 @@ function isFullScreen() {
 
 document.addEventListener('fullscreenchange', function (e) {
     if (isFullScreen()) {
-        vm.isFullscreen = true;
+        videoVM.isFullscreen = true;
     } else {
-        vm.isFullscreen = false;
+        videoVM.isFullscreen = false;
     }
 });
 document.addEventListener('webkitfullscreenchange', function () {
     if (isFullScreen()) {
-        vm.isFullscreen = true;
+        videoVM.isFullscreen = true;
     } else {
-        vm.isFullscreen = false;
+        videoVM.isFullscreen = false;
     }
 });
 document.addEventListener('mozfullscreenchange', function () {
     if (isFullScreen()) {
-        vm.isFullscreen = true;
+        videoVM.isFullscreen = true;
     } else {
-        vm.isFullscreen = false;
+        videoVM.isFullscreen = false;
     }
 });
 document.addEventListener('msfullscreenchange', function () {
     if (isFullScreen()) {
-        vm.isFullscreen = true;
+        videoVM.isFullscreen = true;
     } else {
-        vm.isFullscreen = false;
+        videoVM.isFullscreen = false;
     }
 });
